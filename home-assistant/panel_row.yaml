@@ -1,0 +1,55 @@
+blueprint:
+  name: Matter control panel row
+  description: Link one panel plug endpoint to a Home Assistant light, switch, or fan.
+  domain: automation
+  input:
+    panel_switch:
+      name: Panel row
+      selector:
+        entity:
+          filter:
+            - integration: matter
+              domain: switch
+    target_entity:
+      name: Device to control
+      selector:
+        entity:
+          filter:
+            - domain: [light, switch, fan]
+
+mode: queued
+variables:
+  panel: !input panel_switch
+  device: !input target_entity
+
+triggers:
+  - trigger: state
+    entity_id: !input panel_switch
+    from: ["on", "off"]
+    to: ["on", "off"]
+    id: panel_changed
+  - trigger: state
+    entity_id: !input panel_switch
+    from: ["unknown", "unavailable"]
+    to: ["on", "off"]
+    id: sync
+  - trigger: state
+    entity_id: !input target_entity
+    to: ["on", "off"]
+    id: sync
+  - trigger: homeassistant
+    event: start
+    id: sync
+
+actions:
+  - variables:
+      source_entity: "{{ panel if trigger is defined and trigger.id is defined and trigger.id == 'panel_changed' else device }}"
+      destination: "{{ device if source_entity == panel else panel }}"
+      desired_state: "{{ states(source_entity) }}"
+  - condition: template
+    value_template: >
+      {{ desired_state in ['on', 'off'] and states(destination) in ['on', 'off']
+         and states(destination) != desired_state }}
+  - action: "homeassistant.turn_{{ desired_state }}"
+    target:
+      entity_id: "{{ destination }}"

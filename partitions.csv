@@ -1,0 +1,8 @@
+# Factory application and Matter storage for 4 MB flash.
+# Name, Type, SubType, Offset, Size, Flags
+esp_secure_cert, 0x3f, , 0xd000, 0x2000, encrypted
+nvs, data, nvs, 0x10000, 0xc000,
+nvs_keys, data, nvs_keys, 0x1c000, 0x1000, encrypted
+phy_init, data, phy, 0x1d000, 0x1000,
+factory, app, factory, 0x20000, 0x3c0000,
+fctry, data, nvs, 0x3e0000, 0x6000,

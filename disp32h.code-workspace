@@ -1,0 +1,14 @@
+{
+  "folders": [
+    { "path": "." }
+  ],
+  "extensions": {
+    "recommendations": ["platformio.platformio-ide"]
+  },
+  "settings": {
+    "files.watcherExclude": {
+      "**/.pio/**": true,
+      "**/managed_components/**": true
+    }
+  }
+}
